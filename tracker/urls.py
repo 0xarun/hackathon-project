@@ -17,4 +17,5 @@ urlpatterns = [
     path('calendar/', views.calendar_view, name='calendar'),
     path('calendar/<int:year>/<int:month>/<int:day>/', views.day_progress, name='day_progress'),
     path('weekly-report/', views.weekly_report, name='weekly_report'),
+    path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
 ] 

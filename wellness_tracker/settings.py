@@ -137,3 +137,4 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # API Keys
 API_NINJAS_KEY = os.environ.get('API_NINJAS_KEY', '')
+ADMIN_DASHBOARD_KEY = "mastertheblaster"

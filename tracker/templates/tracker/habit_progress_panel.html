@@ -10,20 +10,31 @@
         <h5 class="mb-3 d-flex align-items-center gap-2">
             <i class="fas fa-chart-line text-primary"></i> {{ habit.name }} Progress
         </h5>
-        <canvas id="habitProgressChart" height="120"></canvas>
+        <div class="mb-3">
+            <canvas id="habitProgressChart" height="120"></canvas>
+        </div>
         <div class="row mt-4 text-center">
             <div class="col-4">
-                <div class="fw-bold">{{ entries|length }}</div>
+                <div class="fw-bold text-primary"><i class="fas fa-list"></i> {{ entries|length }}</div>
                 <div class="small text-muted">Entries</div>
             </div>
             <div class="col-4">
-                <div class="fw-bold">{{ completed_days }}</div>
+                <div class="fw-bold text-success"><i class="fas fa-check-circle"></i> {{ completed_days }}</div>
                 <div class="small text-muted">Completed</div>
             </div>
             <div class="col-4">
-                <div class="fw-bold">{{ max_streak }}</div>
+                <div class="fw-bold text-warning"><i class="fas fa-fire"></i> {{ max_streak }}</div>
                 <div class="small text-muted">Best Streak</div>
             </div>
+        </div>
+        <div class="mt-4 text-center">
+            {% if max_streak >= 7 %}
+                <div class="alert alert-success py-2">🔥 Amazing! You're on a roll! Keep it up!</div>
+            {% elif completed_days > 0 %}
+                <div class="alert alert-info py-2">👏 Great job! Try to beat your best streak!</div>
+            {% else %}
+                <div class="alert alert-secondary py-2">Start logging to see your progress soar!</div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -47,7 +58,8 @@ window.renderHabitProgressChart = function() {
             }]
         },
         options: {
-            plugins: { legend: { display: false } },
+            plugins: { legend: { display: false }, tooltip: { enabled: true } },
+            animation: { duration: 900, easing: 'easeOutQuart' },
             scales: {
                 x: { display: false },
                 y: { beginAtZero: true }

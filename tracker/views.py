@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -12,6 +12,9 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 from calendar import monthrange
 import calendar
+from django.contrib.auth.models import User
+from django.conf import settings
+from django.urls import reverse
 
 def register_view(request):
     if request.method == 'POST':
@@ -32,7 +35,8 @@ def login_view(request):
             user = form.get_user()
             login(request, user)
             messages.success(request, 'Login successful!')
-            return redirect('tracker:dashboard')
+            next_url = request.GET.get('next', 'tracker:dashboard')
+            return redirect(next_url)
     else:
         form = UserLoginForm()
     return render(request, 'tracker/login.html', {'form': form})
@@ -299,9 +303,17 @@ def weekly_report(request):
     
     # Add weekly completion method to Habit model
     for habit in habits:
-        habit_entries = [e for e in entries if e.habit == habit]
-        completed = sum(1 for e in habit_entries if e.value >= habit.target_value)
-        habit.get_weekly_completion = lambda: (completed / len(habit_entries) * 100) if habit_entries else 0
+        daily_percentages = []
+        for i in range(7):
+            day = start_date + timedelta(days=i)
+            entry = next((e for e in entries if e.habit == habit and e.date == day), None)
+            if entry:
+                percent = min(entry.value / habit.target_value, 1.0) * 100
+            else:
+                percent = 0
+            daily_percentages.append(percent)
+        # Average over 7 days
+        habit.get_weekly_completion = (lambda daily_percentages=daily_percentages: sum(daily_percentages) / 7)
     
     context = {
         'weekly_stats': weekly_stats,
@@ -372,3 +384,38 @@ def profile_settings(request):
 def all_habits(request):
     habits = Habit.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'tracker/all_habits.html', {'habits': habits})
+
+def admin_dashboard(request):
+    # Only allow superusers
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        from django.urls import reverse
+        from django.shortcuts import redirect
+        return redirect(reverse('tracker:dashboard'))
+
+    if request.method == 'POST':
+        if request.POST.get('action') == 'delete':
+            user_id = request.POST.get('user_id')
+            if user_id:
+                from django.contrib.auth.models import User
+                try:
+                    user = User.objects.get(id=user_id)
+                    if user != request.user:
+                        user.delete()
+                        messages.success(request, f'User {user.email} deleted.')
+                except User.DoesNotExist:
+                    messages.error(request, 'User not found.')
+            return redirect('tracker:admin_dashboard')
+
+    from django.contrib.auth.models import User
+    users = User.objects.all().order_by('-date_joined')
+    total_users = users.count()
+    active_users = users.filter(is_active=True).count()
+    staff_members = users.filter(is_staff=True).count()
+    superusers = users.filter(is_superuser=True).count()
+    return render(request, 'tracker/admin_dashboard.html', {
+        'users': users,
+        'total_users': total_users,
+        'active_users': active_users,
+        'staff_members': staff_members,
+        'superusers': superusers,
+    })
