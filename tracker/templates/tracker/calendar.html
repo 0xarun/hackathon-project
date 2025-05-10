@@ -1,0 +1,83 @@
+{% extends 'tracker/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Calendar</h2>
+        <div>
+            <a href="?year={{ year|add:'-1' }}&month={{ month }}" class="btn btn-outline-secondary btn-sm me-2">&laquo; Prev Year</a>
+            <a href="?year={{ year }}&month={{ month|add:'-1' }}" class="btn btn-outline-secondary btn-sm me-2">&lsaquo; Prev Month</a>
+            <span class="fw-bold">{{ year }} - {{ month }}</span>
+            <a href="?year={{ year }}&month={{ month|add:'1' }}" class="btn btn-outline-secondary btn-sm ms-2">Next Month &rsaquo;</a>
+            <a href="?year={{ year|add:'1' }}&month={{ month }}" class="btn btn-outline-secondary btn-sm ms-2">Next Year &raquo;</a>
+        </div>
+    </div>
+    <div class="calendar-table-wrapper">
+        <table class="table table-bordered calendar-table bg-white rounded-4 overflow-hidden">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center">Sun</th>
+                    <th class="text-center">Mon</th>
+                    <th class="text-center">Tue</th>
+                    <th class="text-center">Wed</th>
+                    <th class="text-center">Thu</th>
+                    <th class="text-center">Fri</th>
+                    <th class="text-center">Sat</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for week in weeks %}
+                <tr>
+                    {% for day in week %}
+                        {% if day %}
+                        <td class="calendar-day-cell text-center align-middle p-2 {% if day.date == today %}bg-primary text-white{% endif %} calendar-day-clickable" data-date="{{ day.date|date:'Y-m-d' }}" style="cursor:pointer;">
+                            <div class="fw-bold">{{ day.date|date:'j' }}</div>
+                            <div class="d-flex flex-wrap justify-content-center gap-1 mt-1">
+                                {% for entry in day.completed %}
+                                    <span class="badge bg-success" title="{{ entry.habit.name }}">✓</span>
+                                {% endfor %}
+                                {% for entry in day.missed %}
+                                    <span class="badge bg-danger" title="{{ entry.habit.name }}">✗</span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        {% else %}
+                        <td></td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block notes_panel %}
+<div id="day-progress-panel" class="h-100">
+    <div class="text-center text-muted mt-5">
+        <i class="fas fa-info-circle fa-2x mb-3"></i>
+        <h5>Select a day to see progress</h5>
+        <p>Click on a day in the calendar to view detailed progress here.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.calendar-day-clickable').forEach(function(cell) {
+        cell.addEventListener('click', function() {
+            var date = this.getAttribute('data-date').split('-');
+            var url = `/calendar/${date[0]}/${date[1]}/${date[2]}/`;
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('day-progress-panel').innerHTML = html;
+                });
+        });
+    });
+});
+</script>
+{% endblock %} 

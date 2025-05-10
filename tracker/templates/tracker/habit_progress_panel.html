@@ -1,0 +1,59 @@
+{% if no_progress %}
+<div class="text-center text-muted mt-5">
+    <i class="fas fa-info-circle fa-2x mb-3"></i>
+    <h5>No progress so far</h5>
+    <p>Start logging entries for <strong>{{ habit.name }}</strong> to see your progress here.</p>
+</div>
+{% else %}
+<div class="card shadow-sm rounded-4 border-0 mb-3">
+    <div class="card-body">
+        <h5 class="mb-3 d-flex align-items-center gap-2">
+            <i class="fas fa-chart-line text-primary"></i> {{ habit.name }} Progress
+        </h5>
+        <canvas id="habitProgressChart" height="120"></canvas>
+        <div class="row mt-4 text-center">
+            <div class="col-4">
+                <div class="fw-bold">{{ entries|length }}</div>
+                <div class="small text-muted">Entries</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-bold">{{ completed_days }}</div>
+                <div class="small text-muted">Completed</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-bold">{{ max_streak }}</div>
+                <div class="small text-muted">Best Streak</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<script>
+window.renderHabitProgressChart = function() {
+    var ctx = document.getElementById('habitProgressChart').getContext('2d');
+    if (window.habitProgressChart) window.habitProgressChart.destroy();
+    window.habitProgressChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ dates|safe }},
+            datasets: [{
+                label: 'Value',
+                data: {{ values|safe }},
+                borderColor: '#4CAF50',
+                backgroundColor: 'rgba(76,175,80,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { display: false },
+                y: { beginAtZero: true }
+            }
+        }
+    });
+};
+window.renderHabitProgressChart();
+</script> 

@@ -1,0 +1,188 @@
+{% extends 'tracker/base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Weekly Report</h2>
+        <div class="text-muted">
+            <i class="fas fa-calendar-alt me-2"></i>
+            Last 7 Days
+        </div>
+    </div>
+
+    <!-- Stats Cards Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Completion Rate</h6>
+                            <h3 class="mb-0">{{ weekly_stats.completion_rate|floatformat:1 }}%</h3>
+                        </div>
+                        <i class="fas fa-chart-pie fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Completed Entries</h6>
+                            <h3 class="mb-0">{{ weekly_stats.completed_entries }}</h3>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Total Entries</h6>
+                            <h3 class="mb-0">{{ weekly_stats.total_entries }}</h3>
+                        </div>
+                        <i class="fas fa-list fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Daily Average</h6>
+                            <h3 class="mb-0">{{ weekly_stats.average_score|floatformat:1 }}</h3>
+                        </div>
+                        <i class="fas fa-chart-line fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+        <!-- Completion Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Weekly Completion Overview</h5>
+                    <canvas id="completionChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Habit Performance -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Habit Performance</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Habit</th>
+                                    <th>Completion</th>
+                                    <th>Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for habit in habits %}
+                                <tr>
+                                    <td>
+                                        {% if habit.habit_type == 'exercise' %}
+                                            <i class="fas fa-dumbbell text-primary me-2"></i>
+                                        {% elif habit.habit_type == 'sleep' %}
+                                            <i class="fas fa-bed text-primary me-2"></i>
+                                        {% elif habit.habit_type == 'water' %}
+                                            <i class="fas fa-tint text-primary me-2"></i>
+                                        {% elif habit.habit_type == 'meditation' %}
+                                            <i class="fas fa-spa text-primary me-2"></i>
+                                        {% elif habit.habit_type == 'skincare' %}
+                                            <i class="fas fa-leaf text-primary me-2"></i>
+                                        {% elif habit.habit_type == 'reading' %}
+                                            <i class="fas fa-book-open text-primary me-2"></i>
+                                        {% else %}
+                                            <i class="fas fa-star text-primary me-2"></i>
+                                        {% endif %}
+                                        {{ habit.name }}
+                                    </td>
+                                    <td>
+                                        {% with habit_completion=habit.get_weekly_completion %}
+                                            {{ habit_completion|floatformat:1 }}%
+                                        {% endwith %}
+                                    </td>
+                                    <td style="width: 40%">
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: {% with habit_completion=habit.get_weekly_completion %}{{ habit_completion }}{% endwith %}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Completion Chart
+    var ctx = document.getElementById('completionChart').getContext('2d');
+    var chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [
+                '{{ start_date|date:"D" }}',
+                '{{ start_date|date:"D"|add:"1" }}',
+                '{{ start_date|date:"D"|add:"2" }}',
+                '{{ start_date|date:"D"|add:"3" }}',
+                '{{ start_date|date:"D"|add:"4" }}',
+                '{{ start_date|date:"D"|add:"5" }}',
+                '{{ start_date|date:"D"|add:"6" }}'
+            ],
+            datasets: [{
+                label: 'Completed Habits',
+                data: [
+                    {% for date, count in daily_data.items %}
+                        {{ count }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: '#28a745',
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: {{ habits|length }},
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 
