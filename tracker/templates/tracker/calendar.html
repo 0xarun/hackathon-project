@@ -4,62 +4,122 @@
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Calendar</h2>
-        <div>
-            <a href="?year={{ year|add:'-1' }}&month={{ month }}" class="btn btn-outline-secondary btn-sm me-2">&laquo; Prev Year</a>
-            <a href="?year={{ year }}&month={{ month|add:'-1' }}" class="btn btn-outline-secondary btn-sm me-2">&lsaquo; Prev Month</a>
-            <span class="fw-bold">{{ year }} - {{ month }}</span>
-            <a href="?year={{ year }}&month={{ month|add:'1' }}" class="btn btn-outline-secondary btn-sm ms-2">Next Month &rsaquo;</a>
-            <a href="?year={{ year|add:'1' }}&month={{ month }}" class="btn btn-outline-secondary btn-sm ms-2">Next Year &raquo;</a>
+        <h2 class="fw-bold text-gradient mb-0">Calendar</h2>
+        <div class="d-flex align-items-center gap-2">
+            <a href="?year={{ year|add:'-1' }}&month={{ month }}" class="btn btn-outline-secondary">
+                <i class="fas fa-angle-double-left"></i> Prev Year
+            </a>
+            <a href="?year={{ year }}&month={{ month|add:'-1' }}" class="btn btn-outline-secondary">
+                <i class="fas fa-angle-left"></i> Prev Month
+            </a>
+            <span class="fw-bold px-3 py-2 bg-primary bg-opacity-10 text-primary rounded-3">{{ year }} - {{ month }}</span>
+            <a href="?year={{ year }}&month={{ month|add:'1' }}" class="btn btn-outline-secondary">
+                Next Month <i class="fas fa-angle-right"></i>
+            </a>
+            <a href="?year={{ year|add:'1' }}&month={{ month }}" class="btn btn-outline-secondary">
+                Next Year <i class="fas fa-angle-double-right"></i>
+            </a>
         </div>
     </div>
     <div class="calendar-table-wrapper">
-        <table class="table table-bordered calendar-table bg-white rounded-4 overflow-hidden">
-            <thead class="table-light">
-                <tr>
-                    <th class="text-center">Sun</th>
-                    <th class="text-center">Mon</th>
-                    <th class="text-center">Tue</th>
-                    <th class="text-center">Wed</th>
-                    <th class="text-center">Thu</th>
-                    <th class="text-center">Fri</th>
-                    <th class="text-center">Sat</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for week in weeks %}
-                <tr>
-                    {% for day in week %}
-                        {% if day %}
-                        <td class="calendar-day-cell text-center align-middle p-2 {% if day.date == today %}bg-primary text-white{% endif %} calendar-day-clickable" data-date="{{ day.date|date:'Y-m-d' }}" style="cursor:pointer;">
-                            <div class="fw-bold">{{ day.date|date:'j' }}</div>
-                            <div class="d-flex flex-wrap justify-content-center gap-1 mt-1">
-                                {% for entry in day.completed %}
-                                    <span class="badge bg-success" title="{{ entry.habit.name }}">✓</span>
-                                {% endfor %}
-                                {% for entry in day.missed %}
-                                    <span class="badge bg-danger" title="{{ entry.habit.name }}">✗</span>
-                                {% endfor %}
-                            </div>
-                        </td>
-                        {% else %}
-                        <td></td>
-                        {% endif %}
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="card">
+            <div class="card-body p-0">
+                <table class="table table-bordered calendar-table mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-center py-3 bg-primary bg-opacity-10 text-primary">Sun</th>
+                            <th class="text-center py-3 bg-primary bg-opacity-10 text-primary">Mon</th>
+                            <th class="text-center py-3 bg-primary bg-opacity-10 text-primary">Tue</th>
+                            <th class="text-center py-3 bg-primary bg-opacity-10 text-primary">Wed</th>
+                            <th class="text-center py-3 bg-primary bg-opacity-10 text-primary">Thu</th>
+                            <th class="text-center py-3 bg-primary bg-opacity-10 text-primary">Fri</th>
+                            <th class="text-center py-3 bg-primary bg-opacity-10 text-primary">Sat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for week in weeks %}
+                        <tr>
+                            {% for day in week %}
+                                {% if day %}
+                                <td class="calendar-day-cell text-center align-middle p-3 {% if day.date == today %}today{% endif %} calendar-day-clickable" data-date="{{ day.date|date:'Y-m-d' }}">
+                                    <div class="fw-bold mb-2">{{ day.date|date:'j' }}</div>
+                                    <div class="d-flex flex-wrap justify-content-center gap-1">
+                                        {% for entry in day.completed %}
+                                            <span class="badge bg-success bg-opacity-10 text-success" title="{{ entry.habit.name }}">
+                                                <i class="fas fa-check"></i>
+                                            </span>
+                                        {% endfor %}
+                                        {% for entry in day.missed %}
+                                            <span class="badge bg-danger bg-opacity-10 text-danger" title="{{ entry.habit.name }}">
+                                                <i class="fas fa-times"></i>
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                                {% else %}
+                                <td class="bg-light"></td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+    .calendar-table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .calendar-table th {
+        border: none;
+        font-weight: 600;
+    }
+
+    .calendar-table td {
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        transition: var(--transition);
+    }
+
+    .calendar-day-cell {
+        min-height: 100px;
+        cursor: pointer;
+    }
+
+    .calendar-day-cell:hover {
+        background: var(--bg-light);
+        transform: scale(1.02);
+    }
+
+    .calendar-day-cell.today {
+        background: var(--primary-gradient);
+        color: white;
+    }
+
+    .calendar-day-cell.today .badge {
+        background: rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+    }
+
+    .badge {
+        padding: 0.5em 0.75em;
+        font-weight: 500;
+    }
+</style>
 {% endblock %}
 
 {% block notes_panel %}
 <div id="day-progress-panel" class="h-100">
     <div class="text-center text-muted mt-5">
-        <i class="fas fa-info-circle fa-2x mb-3"></i>
-        <h5>Select a day to see progress</h5>
-        <p>Click on a day in the calendar to view detailed progress here.</p>
+        <div class="icon-wrapper bg-primary bg-opacity-10 p-3 rounded-3 mx-auto mb-3" style="width: 60px; height: 60px;">
+            <i class="fas fa-info-circle fa-2x text-primary"></i>
+        </div>
+        <h5 class="fw-bold">Select a day to see progress</h5>
+        <p class="text-muted">Click on a day in the calendar to view detailed progress here.</p>
     </div>
 </div>
 {% endblock %}

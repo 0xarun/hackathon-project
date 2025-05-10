@@ -10,11 +10,255 @@
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --text-dark: #4a5568;
+            --text-light: #718096;
+            --bg-light: #f7fafc;
+            --bg-white: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-light);
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: var(--primary-gradient);
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+            width: 280px;
+        }
+
+        .sidebar-collapsed {
+            width: 80px;
+        }
+
+        .sidebar .nav-link {
+            border-radius: 10px;
+            padding: 12px 16px;
+            transition: var(--transition);
+            margin-bottom: 8px;
+        }
+
+        .sidebar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-brand-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, #e2e8f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .navbar {
+            background: var(--bg-white) !important;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-outline-secondary {
+            border-radius: 10px;
+            padding: 8px 16px;
+            transition: var(--transition);
+        }
+
+        .btn-outline-secondary:hover {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            transform: translateY(-2px);
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .notes-panel {
+            background: var(--bg-white);
+            box-shadow: var(--shadow-sm);
+            border-left: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .profile-image {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+        }
+
+        .profile-image:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .health-tip {
+            background: var(--bg-light);
+            border-radius: 10px;
+            padding: 0.375rem 1rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            height: 38px;
+            line-height: 1.5;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .health-tip .icon-wrapper {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            margin-right: 0.5rem;
+        }
+
+        .health-tip .fa-lightbulb {
+            font-size: 1rem;
+            vertical-align: middle;
+        }
+
+        .health-tip span {
+            font-size: 1rem;
+            line-height: 1.5;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        /* Dashboard specific styles */
+        .text-gradient {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .habit-card {
+            transition: var(--transition);
+            border: none;
+            background: var(--bg-white);
+        }
+
+        .habit-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .habit-card.completed {
+            background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+        }
+
+        .icon-wrapper {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 15px;
+            transition: var(--transition);
+        }
+
+        .stat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .week-calendar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .day-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem;
+            border-radius: 10px;
+            background: var(--bg-light);
+        }
+
+        .day-card.today {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .day-card.today .score {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .progress {
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+    </style>
 </head>
 <body>
     <div class="d-flex min-vh-100">
         <!-- Sidebar -->
-        <nav id="sidebar" class="sidebar bg-dark text-white d-flex flex-column p-3 sidebar-expanded">
+        <nav id="sidebar" class="sidebar text-white d-flex flex-column p-3">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <span class="fs-4 fw-bold d-flex align-items-center gap-2">
                     <button class="btn btn-link text-white p-0 me-2 sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
@@ -26,37 +270,39 @@
             <div class="mb-4 text-center">
                 <a href="{% url 'tracker:profile_settings' %}" class="d-block text-decoration-none text-white">
                     {% if user.is_authenticated %}
-                        <img src="{{ user.profile.get_profile_image_url }}" class="rounded-circle mb-2" width="64" height="64" alt="User">
+                        <img src="{{ user.profile.get_profile_image_url }}" class="rounded-circle mb-2 profile-image" width="80" height="80" alt="User">
                         <div class="fw-bold">{{ user.profile.full_name|default:user.email|default:'Guest' }}</div>
                     {% else %}
-                        <img src="https://randomuser.me/api/portraits/lego/1.jpg" class="rounded-circle mb-2" width="64" height="64" alt="User">
+                        <img src="https://randomuser.me/api/portraits/lego/1.jpg" class="rounded-circle mb-2 profile-image" width="80" height="80" alt="User">
                         <div class="fw-bold">Guest</div>
                     {% endif %}
                 </a>
             </div>
             <ul class="nav flex-column mb-auto sidebar-nav">
-                <li class="nav-item mb-2"><a href="{% url 'tracker:dashboard' %}" class="nav-link text-white d-flex align-items-center gap-2"><i class="fas fa-chart-pie"></i><span class="sidebar-link-text">Dashboard</span></a></li>
-                <li class="nav-item mb-2"><a href="{% url 'tracker:calendar' %}" class="nav-link text-white d-flex align-items-center gap-2"><i class="fas fa-calendar-alt"></i><span class="sidebar-link-text">Calendar</span></a></li>
-                <li class="nav-item mb-2"><a href="{% url 'tracker:profile_settings' %}" class="nav-link text-white d-flex align-items-center gap-2"><i class="fas fa-cog"></i><span class="sidebar-link-text">Settings</span></a></li>
-                <li class="nav-item mb-2"><a href="{% url 'tracker:weekly_report' %}" class="nav-link text-white d-flex align-items-center gap-2"><i class="fas fa-chart-line"></i><span class="sidebar-link-text">Progress</span></a></li>
-                <li class="nav-item mb-2"><a href="{% url 'tracker:all_habits' %}" class="nav-link text-white d-flex align-items-center gap-2"><i class="fas fa-list"></i><span class="sidebar-link-text">All Habits</span></a></li>
+                <li class="nav-item"><a href="{% url 'tracker:dashboard' %}" class="nav-link text-white d-flex align-items-center gap-2"><i class="fas fa-chart-pie"></i><span class="sidebar-link-text">Dashboard</span></a></li>
+                <li class="nav-item"><a href="{% url 'tracker:calendar' %}" class="nav-link text-white d-flex align-items-center gap-2"><i class="fas fa-calendar-alt"></i><span class="sidebar-link-text">Calendar</span></a></li>
+                <li class="nav-item"><a href="{% url 'tracker:profile_settings' %}" class="nav-link text-white d-flex align-items-center gap-2"><i class="fas fa-cog"></i><span class="sidebar-link-text">Settings</span></a></li>
+                <li class="nav-item"><a href="{% url 'tracker:weekly_report' %}" class="nav-link text-white d-flex align-items-center gap-2"><i class="fas fa-chart-line"></i><span class="sidebar-link-text">Progress</span></a></li>
+                <li class="nav-item"><a href="{% url 'tracker:all_habits' %}" class="nav-link text-white d-flex align-items-center gap-2"><i class="fas fa-list"></i><span class="sidebar-link-text">All Habits</span></a></li>
             </ul>
-            <div class="mt-auto">
-                <a href="#" class="btn btn-primary w-100"><i class="fas fa-plus"></i> Add New...</a>
-            </div>
         </nav>
         <!-- Main Content + Right Panel -->
-        <div class="flex-grow-1 d-flex flex-column bg-light">
+        <div class="flex-grow-1 d-flex flex-column">
             <!-- Top Navbar -->
-            <nav class="navbar navbar-light bg-white shadow-sm px-4">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1">Dashboard</span>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="text-muted small"><i class="fas fa-lightbulb text-warning"></i> {{ health_tip }}</span>
+            <nav class="navbar navbar-light px-4">
+                <div class="container-fluid w-100">
+                    <span class="navbar-brand mb-0 h1 fw-bold text-gradient">Dashboard</span>
+                    <div class="d-flex align-items-center justify-content-end gap-3 flex-grow-1">
+                        <div class="health-tip-nav">
+                            <div class="icon-wrapper">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <span class="tip-text">{{ health_tip }}</span>
+                        </div>
                         {% if user.is_authenticated %}
-                            <a href="{% url 'tracker:logout' %}" class="btn btn-outline-secondary btn-sm">Logout</a>
+                            <a href="{% url 'tracker:logout' %}" class="btn btn-outline-secondary">Logout</a>
                         {% else %}
-                            <a href="{% url 'tracker:login' %}" class="btn btn-outline-secondary btn-sm">Login</a>
+                            <a href="{% url 'tracker:login' %}" class="btn btn-outline-secondary">Login</a>
                         {% endif %}
                     </div>
                 </div>
@@ -67,7 +313,7 @@
                     {% block content %}{% endblock %}
                 </main>
                 <!-- Right Panel: Notes -->
-                <aside class="notes-panel bg-white border-start p-3 d-none d-lg-block" style="width: 340px;">
+                <aside id="right-sidebar" class="notes-panel p-4 d-none d-lg-block position-relative" style="width: 340px;">
                     {% block notes_panel %}{% endblock %}
                 </aside>
             </div>
@@ -83,6 +329,37 @@
             el.classList.toggle('d-none');
         });
     };
+
+    // Add active class to current nav item
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    // Responsive: Collapse left sidebar when right sidebar is open, expand when closed
+    function toggleLeftSidebarOnRightPanel(show) {
+        var leftSidebar = document.getElementById('sidebar');
+        if (show) {
+            leftSidebar.classList.add('sidebar-collapsed');
+            document.querySelectorAll('.sidebar-link-text').forEach(function(el) {
+                el.classList.add('d-none');
+            });
+        } else {
+            leftSidebar.classList.remove('sidebar-collapsed');
+            document.querySelectorAll('.sidebar-link-text').forEach(function(el) {
+                el.classList.remove('d-none');
+            });
+        }
+    }
+    // Show right sidebar by default on large screens
+    var rightSidebar = document.getElementById('right-sidebar');
+    if (rightSidebar && window.innerWidth >= 992) {
+        toggleLeftSidebarOnRightPanel(true);
+    }
     </script>
     {% block extra_js %}{% endblock %}
 </body>
