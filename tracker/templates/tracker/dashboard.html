@@ -86,8 +86,18 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="alert alert-info bg-primary bg-opacity-10 border-0 text-primary">
-                    <i class="fas fa-info-circle"></i> You haven't created any habits yet. Click "Add New Habit" to get started!
+                <div class="card border-warning">
+                    <div class="card-body p-4" style="background: linear-gradient(135deg, #fff9e6 0%, #fff5d6 100%);">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="icon-wrapper" style="background: rgba(255, 193, 7, 0.15); padding: 1rem; border-radius: 0.5rem;">
+                                <i class="fas fa-star" style="color: #ffc107; font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1" style="color: #b78103;">Start Your Wellness Journey</h5>
+                                <p class="mb-0" style="color: #856404;">Create your first habit to begin tracking your progress and building a healthier lifestyle!</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             {% endif %}
         </div>
