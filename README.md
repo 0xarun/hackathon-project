@@ -14,7 +14,7 @@ A Django-based web application for tracking daily wellness habits and maintainin
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/athilshanmugam/hackathon-project.git
 cd wellness_tracker
 ```
 
@@ -29,7 +29,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Set up environment variables:
+4. Set up environment variables (Optional) : 
 Create a `.env` file in the project root and add:
 ```
 API_NINJAS_KEY=your_api_key_here
@@ -58,7 +58,7 @@ python manage.py runserver
 3. Create habits and log your daily progress.
 4. View your progress in the calendar and weekly reports.
 
-## API Integration
+## API Integration (Optional) 
 
 The application uses the API Ninjas Health Tips API to fetch daily health tips. You'll need to:
 1. Sign up for an API key at https://api-ninjas.com
