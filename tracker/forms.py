@@ -10,6 +10,11 @@ class UserRegistrationForm(UserCreationForm):
         model = User
         fields = ('email', 'password1', 'password2')
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.username = self.cleaned_data['email']  # Use email as username
@@ -20,6 +25,11 @@ class UserRegistrationForm(UserCreationForm):
 
 class UserLoginForm(AuthenticationForm):
     username = forms.EmailField(label='Email')  # Change username label to Email
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
 class HabitForm(forms.ModelForm):
     class Meta:

@@ -223,36 +223,34 @@ body {
 
 /* Form Controls */
 .form-control {
-    border-radius: 5px;
-    border: 1px solid #ced4da;
-    padding: 0.75rem;
+    border-radius: 10px;
+    border: 1.5px solid #e0e0e0;
+    padding: 0.85rem 1.1rem;
+    font-size: 1.08rem;
+    background: #f8fafc;
+    color: var(--dark-text);
+    box-shadow: 0 1px 2px rgba(76,175,80,0.03);
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
-
 .form-control:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba(76,175,80,0.10);
+    outline: none;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .habit-card {
-        margin-bottom: 1rem;
-    }
-    
-    .stats-card {
-        margin-bottom: 1rem;
-    }
-    
-    .day-card {
-        flex-direction: column;
-        align-items: stretch;
-        text-align: center;
-    }
-    
-    .day-card .date,
-    .day-card .score {
-        width: auto;
-    }
+label, .form-label {
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 0.35rem;
+    letter-spacing: 0.01em;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+    box-shadow: 0 0 0 1000px #f8fafc inset !important;
+    -webkit-box-shadow: 0 0 0 1000px #f8fafc inset !important;
+    -webkit-text-fill-color: var(--dark-text) !important;
 }
 
 /* Wellness Score Card */
