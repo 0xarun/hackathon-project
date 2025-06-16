@@ -362,5 +362,23 @@
     }
     </script>
     {% block extra_js %}{% endblock %}
+    
+    <!-- Footer -->
+    <footer class="footer mt-auto py-3 bg-white border-top">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <span class="text-gradient fw-bold">Wellness Tracker</span>
+                    <span class="text-muted small ms-2">&copy; {% now "Y" %}</span>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="{% url 'tracker:dashboard' %}" class="text-decoration-none text-muted small me-3">Dashboard</a>
+                    <a href="{% url 'tracker:calendar' %}" class="text-decoration-none text-muted small me-3">Calendar</a>
+                    <a href="{% url 'tracker:weekly_report' %}" class="text-decoration-none text-muted small me-3">Progress</a>
+                    <a href="{% url 'tracker:profile_settings' %}" class="text-decoration-none text-muted small">Settings</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
 </html> 

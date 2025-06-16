@@ -16,6 +16,12 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.urls import reverse
 
+def landing_page(request):
+    """Landing page view for non-authenticated users."""
+    if request.user.is_authenticated:
+        return redirect('tracker:dashboard')
+    return render(request, 'tracker/landing.html')
+
 def register_view(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -156,6 +162,7 @@ def dashboard(request):
     }
     return render(request, 'tracker/dashboard.html', context)
 
+@login_required
 def habit_create(request):
     if request.method == 'POST':
         form = HabitForm(request.POST)
@@ -169,7 +176,7 @@ def habit_create(request):
         form = HabitForm()
     return render(request, 'tracker/habit_form.html', {'form': form})
 
-
+@login_required
 def log_entry(request, habit_id):
     habit = get_object_or_404(Habit, id=habit_id, user=request.user)
     today = timezone.now().date()
@@ -177,14 +184,12 @@ def log_entry(request, habit_id):
     if request.method == 'POST':
         form = WellnessEntryForm(request.POST, habit=habit, date=today)
         if form.is_valid():
-            # Try to get existing entry or create new one
             entry, created = WellnessEntry.objects.get_or_create(
                 habit=habit,
                 date=today,
                 defaults={'value': form.cleaned_data['value']}
             )
             if not created:
-                # Update existing entry
                 entry.value = form.cleaned_data['value']
                 entry.save()
             messages.success(request, 'Entry logged successfully!')
@@ -385,18 +390,12 @@ def all_habits(request):
     habits = Habit.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'tracker/all_habits.html', {'habits': habits})
 
+@user_passes_test(lambda u: u.is_superuser)
 def admin_dashboard(request):
-    # Only allow superusers
-    if not request.user.is_authenticated or not request.user.is_superuser:
-        from django.urls import reverse
-        from django.shortcuts import redirect
-        return redirect(reverse('tracker:dashboard'))
-
     if request.method == 'POST':
         if request.POST.get('action') == 'delete':
             user_id = request.POST.get('user_id')
             if user_id:
-                from django.contrib.auth.models import User
                 try:
                     user = User.objects.get(id=user_id)
                     if user != request.user:
@@ -406,7 +405,6 @@ def admin_dashboard(request):
                     messages.error(request, 'User not found.')
             return redirect('tracker:admin_dashboard')
 
-    from django.contrib.auth.models import User
     users = User.objects.all().order_by('-date_joined')
     total_users = users.count()
     active_users = users.filter(is_active=True).count()
